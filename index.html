@@ -75,6 +75,7 @@ button{
     font-size:18px;
 }
 
+/* POST */
 .post{
     background:white;
     margin:10px 0;
@@ -151,20 +152,20 @@ const db = firebase.firestore();
    LOGIN
 ========================= */
 function login(){
-    let p=document.getElementById("pass").value.trim();
+    let p = document.getElementById("pass").value.trim();
 
-    if(p==="AriQuixLOL8*"){
-        document.getElementById("login").style.display="none";
-        document.getElementById("app").style.display="block";
+    if(p === "AriQuixLOL8*"){
+        document.getElementById("login").style.display = "none";
+        document.getElementById("app").style.display = "block";
         loadPosts();
-    }else{
+    } else {
         alert("incorrecto");
     }
 }
 
 function guest(){
-    document.getElementById("login").style.display="none";
-    document.getElementById("app").style.display="block";
+    document.getElementById("login").style.display = "none";
+    document.getElementById("app").style.display = "block";
     loadPosts();
 }
 
@@ -186,22 +187,22 @@ function like(id,current){
 }
 
 function loadPosts(){
-    const app=document.getElementById("app");
+    const app = document.getElementById("app");
 
     db.collection("posts")
     .orderBy("createdAt","desc")
-    .onSnapshot(snapshot=>{
+    .onSnapshot(snapshot => {
 
         let html = `<div class="welcome">✦ Bienvenido a AriQuix Blog ✦</div>`;
 
-        snapshot.forEach(doc=>{
-            let post=doc.data();
+        snapshot.forEach(doc => {
+            let post = doc.data();
 
             html += `
                 <div class="post">
                     <p>${post.text || ""}</p>
 
-                    <button class="likeBtn" onclick="like('${doc.id}',${post.likes})">
+                    <button class="likeBtn" onclick="like('${doc.id}', ${post.likes})">
                         ♡ ${post.likes}
                     </button>
                 </div>
