@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>AriQuix Blog</title>
+
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+<style>
+body{
+    margin:0;
+    font-family:-apple-system, BlinkMacSystemFont, sans-serif;
+    background:linear-gradient(135deg,#ffe6f2,#fff);
+}
+
+/* HEADER */
+.header{
+    text-align:center;
+    padding:25px 10px;
+    color:#ff4fa3;
+    font-size:26px;
+    font-weight:600;
+}
+
+/* LOGIN */
+#login{
+    position:fixed;
+    inset:0;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    background:rgba(255,255,255,0.95);
+}
+
+.card{
+    background:white;
+    padding:18px;
+    border-radius:16px;
+    box-shadow:0 4px 20px rgba(0,0,0,0.08);
+    width:85%;
+    max-width:320px;
+}
+
+input{
+    width:100%;
+    padding:10px;
+    border-radius:12px;
+    border:1px solid #ffd1e6;
+    margin-top:8px;
+}
+
+button{
+    width:100%;
+    margin-top:10px;
+    padding:10px;
+    border:none;
+    border-radius:12px;
+    background:#ff6fb1;
+    color:white;
+}
+
+/* APP */
+#app{
+    display:none;
+    padding:15px;
+}
+
+.welcome{
+    text-align:center;
+    color:#ff4fa3;
+    margin:20px 0;
+    font-size:18px;
+}
+
+.post{
+    background:white;
+    margin:10px 0;
+    padding:12px;
+    border-radius:14px;
+    box-shadow:0 4px 15px rgba(0,0,0,0.05);
+}
+
+.likeBtn{
+    background:#ff6fb1;
+    color:white;
+    border:none;
+    padding:6px 10px;
+    border-radius:10px;
+    margin-top:8px;
+}
+
+/* sparkle */
+.sparkle{
+    position:fixed;
+    width:4px;
+    height:4px;
+    background:white;
+    border-radius:50%;
+    opacity:0.6;
+    animation:float 6s infinite ease-in-out;
+}
+
+@keyframes float{
+    0%{transform:translateY(0);opacity:0;}
+    50%{opacity:1;}
+    100%{transform:translateY(-100vh);opacity:0;}
+}
+</style>
+</head>
+
+<body>
+
+<div class="header">♡ AriQuix Blog ♡</div>
+
+<!-- LOGIN -->
+<div id="login">
+    <div class="card">
+        <input id="pass" type="password" placeholder="contraseña">
+        <button onclick="login()">Entrar como moderador</button>
+        <button onclick="guest()">Entrar como invitado</button>
+    </div>
+</div>
+
+<!-- APP -->
+<div id="app"></div>
+
+<!-- FIREBASE -->
+<script src="https://www.gstatic.com/firebasejs/10.12.4/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore-compat.js"></script>
+
+<script>
+/* =========================
+   FIREBASE INIT
+========================= */
+const firebaseConfig = {
+  apiKey: "AIzaSyAXt_crQMKxoO_Ery5r1s-Qmz7IT3irKYI",
+  authDomain: "ariquixsite-b6a2c.firebaseapp.com",
+  projectId: "ariquixsite-b6a2c",
+  storageBucket: "ariquixsite-b6a2c.appspot.com",
+  messagingSenderId: "889262260988",
+  appId: "1:889262260988:web:8ccf2184d74172043fcd79"
+};
+
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
+
+/* =========================
+   LOGIN
+========================= */
+function login(){
+    let p=document.getElementById("pass").value.trim();
+
+    if(p==="AriQuixLOL8*"){
+        document.getElementById("login").style.display="none";
+        document.getElementById("app").style.display="block";
+        loadPosts();
+    }else{
+        alert("incorrecto");
+    }
+}
+
+function guest(){
+    document.getElementById("login").style.display="none";
+    document.getElementById("app").style.display="block";
+    loadPosts();
+}
+
+/* =========================
+   POSTS
+========================= */
+function createPost(text){
+    db.collection("posts").add({
+        text:text,
+        likes:0,
+        createdAt:Date.now()
+    });
+}
+
+function like(id,current){
+    db.collection("posts").doc(id).update({
+        likes: current + 1
+    });
+}
+
+function loadPosts(){
+    const app=document.getElementById("app");
+
+    db.collection("posts")
+    .orderBy("createdAt","desc")
+    .onSnapshot(snapshot=>{
+
+        let html = `<div class="welcome">✦ Bienvenido a AriQuix Blog ✦</div>`;
+
+        snapshot.forEach(doc=>{
+            let post=doc.data();
+
+            html += `
+                <div class="post">
+                    <p>${post.text || ""}</p>
+
+                    <button class="likeBtn" onclick="like('${doc.id}',${post.likes})">
+                        ♡ ${post.likes}
+                    </button>
+                </div>
+            `;
+        });
+
+        app.innerHTML = html;
+    });
+}
+
+/* =========================
+   PARTICLES
+========================= */
+for(let i=0;i<15;i++){
+    let s=document.createElement("div");
+    s.className="sparkle";
+    s.style.left=Math.random()*100+"vw";
+    s.style.top=Math.random()*100+"vh";
+    s.style.animationDuration=(3+Math.random()*5)+"s";
+    document.body.appendChild(s);
+}
+</script>
+
+</body>
+</html>
